@@ -1,81 +1,79 @@
-var vigenere = vigenere || (function(){
+var vigenere = vigenere || (function () {
+    var proceso = function (txt, clave, action) {
+        var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+        var longitud = abc.length;
 
-    //Aqui tenemos que crear una funcion que se encargue de obtener el texto, desplazamiento y si va a cifrar o descifrar
+        var resultado = "";
+        var indiceClave = 0;
 
-    var proceso = function(txt, desp, action){
-        var replace = (function(){
-            //ABC
-            var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-            var longitud = abc.length;
+        for (var i = 0; i < txt.length; i++) {
+            var c = txt.charAt(i).toLowerCase();
+            var iTxt = abc.indexOf(c);
 
-            return function(c){
-                var i = abc.indexOf(c.toLowerCase());
-                if(i != -1){
-                    var pos = i;
-                    if(action){
-                        //cifrar
-                        pos += desp;
-                        pos = (pos >= longitud) ? pos - 1: pos;
-                    }else{
-                        //descifrar ahi lo hacen :3
-                    }
-                    return abc[pos];
+            if (iTxt !== -1) {
+                var desp = abc.indexOf(clave.charAt(indiceClave).toLowerCase());
+
+                if (action) {
+                    iTxt += desp;  // Cifrar
+                    if (iTxt >= longitud) iTxt -= longitud;
+                } else {
+                    iTxt -= desp;  // Descifrar
+                    if (iTxt < 0) iTxt += longitud;
                 }
-                return c;
-            };
-        })();
 
-        //hay que validar la cadena
-        var re = (/([a-z])/ig);
+                resultado += abc[iTxt];
+                indiceClave = (indiceClave + 1) % clave.length;
+            } else {
+                resultado += c;  // Caracteres fuera del alfabeto se copian tal cual
+            }
+        }
 
-        return String(txt).replace(re,function(match){
-            return replace(match);
-        });
+        return resultado;
     };
-    return{
-        //vamos a saber si queremos cifrar o descifrar
-        encode : function(txt, desp){
-            return proceso(txt, desp, true);
+
+    return {
+        encode: function (txt, clave) {
+            return proceso(txt, clave, true);
         },
-        decode : function(txt, desp){
-            return proceso(txt, desp, false);
+        decode: function (txt, clave) {
+            return proceso(txt, clave, false);
         }
     };
 })();
 
-//cuando los campos esten vacios
-
-//cuando la clave sea mas grande que el texto para cifrar
-
-//cuando la clave sea mas grande que el texto para descifrar
-
-//cifrar
-function codificar(texto, clave){
-
-    var resultado = "";
-    var indiceclave = 0;
-    var charartexto = texto.split('');
-
-    for(var i = 0; i < charartexto.length; i++){
-        var desp = obindiceClave(clave.charAt(indiceclave));
-        var chartexto = charartexto[i];
-
-        resultado += vigenere.encode(chartexto, (desp >= 26) ? desp%26 : desp);
-        indiceclave++;
-
-        if(indiceclave >= clave.length){
-            indiceclave = 0;
-        }
-
-        document.getElementById("resultado").value = resultado;
+function codificar() {
+    const texto = document.getElementById("txt").value;
+    const clave = document.getElementById("txtclave").value;
+    if (texto && clave) {
+        document.getElementById("respuesta").value = vigenere.encode(texto, clave);
+    } else {
+        alert("Por favor, completa ambos campos.");
     }
 }
 
-function obindiceClave(reco){
-    var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'ñ', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-    return abc.indexOf(reco.toLowerCase());
+function decodificar() {
+    const texto = document.getElementById("txt").value;
+    const clave = document.getElementById("txtclave").value;
+    if (texto && clave) {
+        document.getElementById("respuesta").value = vigenere.decode(texto, clave);
+    } else {
+        alert("Por favor, completa ambos campos.");
+    }
 }
 
-//decifrar
+function reiniciar() {
+    document.getElementById("txt").value = "";
+    document.getElementById("txtclave").value = "";
+    document.getElementById("respuesta").value = "";
+}
 
-//reiniciar
+function copiarTexto() {
+    const resultado = document.getElementById("respuesta");
+    if (resultado.value) {
+        navigator.clipboard.writeText(resultado.value)
+            .then(() => alert("Texto copiado al portapapeles."))
+            .catch(() => alert("Error al copiar el texto."));
+    } else {
+        alert("No hay texto para copiar.");
+    }
+}
