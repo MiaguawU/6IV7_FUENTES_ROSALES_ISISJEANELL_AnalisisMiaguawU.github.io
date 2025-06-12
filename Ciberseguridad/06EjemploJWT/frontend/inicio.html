@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inicio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f4eefc; }
+    .inicio-box {
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(128, 0, 128, 0.15);
+    }
+    .btn-morado {
+      background-color: purple;
+      color: white;
+    }
+    .btn-morado:hover {
+      background-color: #5c005c;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="inicio-box">
+    <h2 class="mb-4 text-center">Información del Usuario</h2>
+    <div id="userInfo" class="mb-3">
+      <!-- Aquí se mostrará la información del usuario -->
+    </div>
+    <button class="btn btn-morado w-100" onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <script>
+    async function fetchUserData() {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        alert("Usuario no autenticado");
+        window.location.href = "bienvenida.html"; // Cambia esto por la ruta de tu página de inicio de sesión
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:5000/api/auth/${userId}`);
+        if (!res.ok) {
+          throw new Error("Usuario no encontrado");
+        }
+
+        const user = await res.json();
+
+        document.getElementById("userInfo").innerHTML = `
+          <p><strong>ID:</strong> ${user.id}</p>
+          <p><strong>Nombre:</strong> ${user.nombre}</p>
+          <p><strong>Segundo Nombre:</strong> ${user.segundo_nombre || ''}</p>
+          <p><strong>Apellido Paterno:</strong> ${user.apellido_p}</p>
+          <p><strong>Apellido Materno:</strong> ${user.apellido_m}</p>
+          <p><strong>Correo:</strong> ${user.email}</p>
+        `;
+      } catch (error) {
+        console.error(error);
+        alert("Error al obtener datos del usuario");
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("userId");
+      window.location.href = "bienvenida.html"; // Cambia esto si tu página de login tiene otro nombre
+    }
+
+    fetchUserData();
+  </script>
+</body>
+</html>
