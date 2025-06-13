@@ -72,6 +72,7 @@ router.post('/login', (req, res) => {
             { expiresIn:'1h' }
         );
         console.log('Token Generado para el usuario: ', user.email);
+        console.log('token: ',token)
         res.json({ token, id: user.id });
     });
 });
